@@ -1,0 +1,459 @@
+{
+	"openapi": "3.0.0",
+	"info": {
+		"version": "1.0.0",
+		"title": "URLs_Monitor",
+		"description": "Simple web application that allows users to monitor their URLs."
+	},
+	"tags": [
+		{
+			"name": "Users",
+			"description": "Users endpoints"
+		},
+		{
+			"name": "Users Protected",
+			"description": "Users protected endpoints for logged in users"
+		},
+		{
+			"name": "Checks",
+			"description": "Checks endpoints"
+		},
+		{
+			"name": "Reports",
+			"description": "Reports endpoints"
+		}
+	],
+	"paths": {
+		"/users/signup": {
+			"post": {
+				"tags": ["Users"],
+				"summary": "Signup endpoint",
+				"operationId": "signup",
+				"requestBody": {
+					"description": "user signup data",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/User"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "successful operation",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"status": {
+											"type": "string",
+											"example": "success"
+										},
+										"statusCode": {
+											"type": "number",
+											"example": 201
+										},
+										"data": {
+											"type": "object",
+											"properties": {
+												"_id": {
+													"type": "string",
+													"example": "507f1f77bcf86cd799439011"
+												},
+												"name": {
+													"type": "string",
+													"example": "abdo"
+												},
+												"email": {
+													"type": "string",
+													"example": "abdo@example.com"
+												}
+											}
+										}
+									}
+								}
+							}
+						},
+						"headers": {
+							"Set-Cookie": {
+								"schema": {
+									"type": "string",
+									"example": "jwt=abcasfa33asfde12345; Path=/; HttpOnly"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request. email:should be unique.password:should NOT have fewer than 8 characters.password:passwords are not the same"
+					},
+					"500": {
+						"description": "Error in sign up. Try again later."
+					}
+				}
+			}
+		},
+		"/users/login": {
+			"post": {
+				"tags": ["Users"],
+				"summary": "Login endpoint",
+				"operationId": "login",
+				"requestBody": {
+					"description": "User login data",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"email": {
+										"type": "string",
+										"example": "abdo@example.com"
+									},
+									"password": {
+										"type": "string",
+										"example": "abdo1_3passowrd"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "successful operation",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"status": {
+											"type": "string",
+											"example": "success"
+										},
+										"statusCode": {
+											"type": "number",
+											"example": 200
+										},
+										"data": {
+											"type": "object",
+											"properties": {
+												"_id": {
+													"type": "string",
+													"example": "507f1f77bcf86cd799439011"
+												},
+												"name": {
+													"type": "string",
+													"example": "abdo"
+												},
+												"email": {
+													"type": "string",
+													"example": "abdo@example.com"
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Incorrect email or password. / Please provide email and password!"
+					},
+					"500": {
+						"description": "Error in login. Please log in again."
+					}
+				}
+			}
+		},
+		"/users/logout": {
+			"post": {
+				"tags": ["Users Protected"],
+				"summary": "Logout endpoint",
+				"operationId": "logout",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "successful operation",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"status": {
+											"type": "string",
+											"example": "success"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Invalid token, Please log in again."
+					}
+				}
+			}
+		},
+		"/users/confirm/{confirmationCode}": {
+			"get": {
+				"tags": ["Users Protected"],
+				"summary": "User verification endpoint",
+				"operationId": "userVerificationEndpoint",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "successful operation",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"status": {
+											"type": "string",
+											"example": "success"
+										},
+										"statusCode": {
+											"type": "number",
+											"example": 200
+										},
+										"massage": "Email verified successfully"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"massage": "verification failed"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/checks": {
+			"post": {
+				"tags": ["Checks"],
+				"summary": "Create check",
+				"operationId": "createCheck",
+				"requestBody": {
+					"description": "Check",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Check"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "successful operation",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"status": {
+											"type": "string",
+											"example": "success"
+										},
+										"statusCode": {
+											"type": "number",
+											"example": 201
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"status": {
+											"type": "string",
+											"example": "fail"
+										},
+										"statusCode": {
+											"type": "number",
+											"example": 400
+										},
+										"massage": {
+											"type": "string",
+											"example": "check not valid"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/reports/{checkId}": {
+			"get": {
+				"tags": ["Reports"],
+				"summary": "Get report by check Id",
+				"operationId": "getReportById",
+				"responses": {
+					"200": {
+						"description": "successful operation",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"status": {
+											"type": "string",
+											"example": "success"
+										},
+										"statusCode": {
+											"type": "number",
+											"example": 200
+										},
+										"data": {
+											"type": "object",
+											"properties": {
+												"_id": {
+													"type": "string",
+													"example": "507f1f77bcf86cd799439011"
+												},
+												"name": {
+													"type": "string",
+													"example": "abdo"
+												},
+												"email": {
+													"type": "string",
+													"example": "abdo@example.com"
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"status": {
+											"type": "string",
+											"example": "fail"
+										},
+										"statusCode": {
+											"type": "number",
+											"example": 400
+										},
+										"massage": "Check not found"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"User": {
+				"type": "object",
+				"properties": {
+					"email": {
+						"type": "string",
+						"example": "abdo@example.com"
+					},
+					"password": {
+						"type": "string",
+						"example": "abdo_passowrd"
+					}
+				}
+			},
+			"Check": {
+				"type": "object",
+				"properties": {
+					"url": { "type": "string" },
+					"tags": { "type": "string" },
+					"name": { "type": "string" },
+
+					"path": { "type": "string" },
+					"protocol": { "type": "string" },
+					"port": { "type": "integer" },
+					"webhook": { "type": "string" },
+					"threshold": { "type": "integer" },
+					"timeout": { "type": "integer" },
+					"assert": { "type": "string" },
+					"ignoreSSL": { "type": "boolean" },
+					"interval": { "type": "integer" },
+					"httpHeaders": { "type": "object" },
+					"authentication": { "type": "object" }
+				}
+			},
+			"Report": {
+				"type": "object",
+				"properties": {
+					"status": {
+						"type": "number",
+						"example": 200
+					},
+					"availability": {
+						"type": "number",
+						"example": "70"
+					},
+					"outages": {
+						"type": "number",
+						"example": "50"
+					},
+					"downtime": {
+						"type": "number",
+						"example": "2334"
+					},
+					"uptime": {
+						"type": "number",
+						"example": 342
+					},
+					"responseTime": {
+						"type": "number",
+						"example": 2
+					},
+					"history": {
+						"type": "object"
+					}
+				}
+			}
+		}
+	},
+	"servers": [
+		{
+			"description": "Try it Now",
+			"url": "http://localhost:3000/api/v1/"
+		}
+	]
+}
